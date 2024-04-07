@@ -1,3 +1,9 @@
+# Home
+GET http://localhost:3333/
+
+###
+
+# Create Event
 POST http://localhost:3333/events
 Content-Type: application/json
 
@@ -5,4 +11,15 @@ Content-Type: application/json
   "title": "Unite Summite",
   "details": "An event for programming lovers!",
   "maximumAttendees": 100
+}
+
+###
+
+# Register Attendee
+POST http://localhost:3333/events/10b2e575-4154-4b59-97f9-3bf4b2a66fde/attendees
+Content-Type: application/json
+
+{
+  "name": "Eduardo",
+  "email": "eduardo@teste.com"
 }
