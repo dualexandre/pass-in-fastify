@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "tsx watch --env-file .env src/server.ts",
     "lint": "eslint src/**/*.ts --fix",
-    "build": "tsup src --format esm"
+    "build": "tsup src --format esm",
+    "start": "node dist/server.mjs",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
