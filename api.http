@@ -16,10 +16,20 @@ Content-Type: application/json
 ###
 
 # Register Attendee
-POST http://localhost:3333/events/b940da9d-799b-40d8-a588-a27f33e542a8/attendees
+POST http://localhost:3333/events/eb320fb3-d90f-4620-9687-d3cd52f2430b/attendees
 Content-Type: application/json
 
 {
   "name": "Eduardo",
   "email": "eduardo@teste.com"
 }
+
+###
+
+# Get Event
+GET http://localhost:3333/events/eb320fb3-d90f-4620-9687-d3cd52f2430b
+
+###
+
+# Get Attendee Badge
+GET http://localhost:3333/attendees/1/badge
