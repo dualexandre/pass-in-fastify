@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { prisma } from '../libs/prisma';
 import { BadRequest } from '../_errors/bad-request';
 import { EventService } from '../services/event-service';
+import { AttendeeService } from '../services/attendee-service';
 
 export async function registerForEvent(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -30,15 +30,12 @@ export async function registerForEvent(app: FastifyInstance) {
       const { eventId } = request.params;
       const { name, email } = request.body;
       const eventService = new EventService();
+      const attendeeService = new AttendeeService();
 
-      const attendeeFromEmail = await prisma.attendee.findUnique({
-        where: {
-          eventId_email: {
-            email,
-            eventId,
-          },
-        },
-      });
+      const attendeeFromEmail = await attendeeService.getByEmailAndEventId(
+        email,
+        eventId,
+      );
 
       if (attendeeFromEmail) {
         throw new BadRequest(
@@ -57,13 +54,7 @@ export async function registerForEvent(app: FastifyInstance) {
         );
       }
 
-      const attendee = await prisma.attendee.create({
-        data: {
-          name,
-          email,
-          eventId,
-        },
-      });
+      const attendee = await attendeeService.create(name, email, eventId);
 
       return reply.status(201).send({ attendeeId: attendee.id });
     },

@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { prisma } from '../libs/prisma';
 import { BadRequest } from '../_errors/bad-request';
+import { AttendeeService } from '../services/attendee-service';
 
 export async function getAttendeeBadge(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -28,21 +28,9 @@ export async function getAttendeeBadge(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { attendeeId } = request.params;
+      const attendeeService = new AttendeeService();
 
-      const attendee = await prisma.attendee.findUnique({
-        select: {
-          name: true,
-          email: true,
-          event: {
-            select: {
-              title: true,
-            },
-          },
-        },
-        where: {
-          id: attendeeId,
-        },
-      });
+      const attendee = await attendeeService.getById(attendeeId);
 
       if (!attendee) {
         throw new BadRequest('Attendee not found.');

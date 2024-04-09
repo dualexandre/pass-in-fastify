@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { prisma } from '../libs/prisma';
 import { z } from 'zod';
+import { AttendeeService } from '../services/attendee-service';
 
 export async function getEventAttendees(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -35,26 +35,13 @@ export async function getEventAttendees(app: FastifyInstance) {
     async (request, reply) => {
       const { eventId } = request.params;
       const { query, pageIndex } = request.query;
+      const attendeeService = new AttendeeService();
 
-      const attendees = await prisma.attendee.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          createdAt: true,
-          checkIn: {
-            select: {
-              createdAt: true,
-            },
-          },
-        },
-        where: query ? { eventId, name: { contains: query } } : { eventId },
-        take: 10,
-        skip: pageIndex * 10,
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
+      const attendees = await attendeeService.getByNameOrEventId(
+        eventId,
+        pageIndex,
+        query,
+      );
 
       return reply.send({
         attendees: attendees.map((attendee) => {
