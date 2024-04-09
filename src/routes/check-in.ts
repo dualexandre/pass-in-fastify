@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { prisma } from '../libs/prisma';
 import { BadRequest } from '../_errors/bad-request';
 import { AttendeeService } from '../services/attendee-service';
+import { CheckInService } from '../services/check-in-service';
 
 export async function checkIn(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -23,28 +23,19 @@ export async function checkIn(app: FastifyInstance) {
     async (request, reply) => {
       const { attendeeId } = request.params;
       const attendeeService = new AttendeeService();
+      const checkInService = new CheckInService();
 
-      const attendeeCheckIn = await prisma.checkIn.findUnique({
-        where: {
-          attendeeId,
-        },
-      });
-
-      const attendee = await attendeeService.getById(attendeeId);
-
-      if (!attendee) {
-        throw new BadRequest('Attendee not found.');
-      }
-
+      const attendeeCheckIn = await checkInService.getByAttendeeId(attendeeId);
       if (attendeeCheckIn) {
         throw new BadRequest('Attendee already checked in.');
       }
 
-      await prisma.checkIn.create({
-        data: {
-          attendeeId,
-        },
-      });
+      const attendee = await attendeeService.getById(attendeeId);
+      if (!attendee) {
+        throw new BadRequest('Attendee not found.');
+      }
+
+      checkInService.create(attendeeId);
 
       return reply.status(201).send();
     },
