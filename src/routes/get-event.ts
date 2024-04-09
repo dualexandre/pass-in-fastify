@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { prisma } from '../libs/prisma';
 import { BadRequest } from '../_errors/bad-request';
+import { EventService } from '../services/event-service';
 
 export async function getEvent(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -30,24 +30,9 @@ export async function getEvent(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { eventId } = request.params;
+      const eventService = new EventService();
 
-      const event = await prisma.event.findUnique({
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          details: true,
-          maximumAttendees: true,
-          _count: {
-            select: {
-              attendees: true,
-            },
-          },
-        },
-        where: {
-          id: eventId,
-        },
-      });
+      const event = await eventService.getById(eventId);
 
       if (!event) {
         throw new BadRequest('Event not found.');

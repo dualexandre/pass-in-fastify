@@ -7,6 +7,7 @@ import {
 import fastify from 'fastify';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import fastifyCors from '@fastify/cors';
 
 import { createEvent } from './routes/create-event';
 import { registerForEvent } from './routes/register-for-event';
@@ -15,7 +16,6 @@ import { getAttendeeBadge } from './routes/get-attendee-badge';
 import { checkIn } from './routes/check-in';
 import { getEventAttendees } from './routes/get-event-attendees';
 import { errorHandler } from './error-handler';
-import fastifyCors from '@fastify/cors';
 import { home } from './routes/home';
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>();
